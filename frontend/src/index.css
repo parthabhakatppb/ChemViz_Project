@@ -1,0 +1,395 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==================== UNIFIED DESIGN SYSTEM ==================== */
+
+@layer base {
+  :root {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 187 85% 53%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 222 30% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 30% 15%;
+    --muted-foreground: 215 20% 60%;
+    --accent: 187 60% 25%;
+    --accent-foreground: 187 85% 85%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 30% 20%;
+    --input: 222 30% 18%;
+    --ring: 187 85% 53%;
+    --radius: 0.75rem;
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 187 85% 53%;
+    --sidebar-primary-foreground: 222 47% 8%;
+    --sidebar-accent: 222 30% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 222 30% 18%;
+    --sidebar-ring: 187 85% 53%;
+    
+    /* High Contrast Colors */
+    --color-blue-light: #eff6ff;
+    --color-blue-dark: #0c2340;
+    --color-purple-light: #faf5ff;
+    --color-purple-dark: #2d1b4e;
+    --color-green-light: #f0fdf4;
+    --color-green-dark: #052e16;
+    --color-red-light: #fef2f2;
+    --color-red-dark: #4c0519;
+  }
+  
+  /* Light mode overrides */
+  .light {
+    color-scheme: light;
+  }
+  
+  /* Dark mode overrides */
+  .dark {
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground antialiased; }
+}
+
+/* ==================== UNIFIED CARD STYLING ==================== */
+
+@layer components {
+  .card-base {
+    @apply rounded-xl border transition-all duration-300 ease-out;
+  }
+  
+  .card-light {
+    @apply bg-white border-slate-200 shadow-md hover:shadow-lg;
+  }
+  
+  .card-dark {
+    @apply dark:bg-slate-800 dark:border-slate-600 dark:shadow-lg dark:hover:shadow-xl;
+  }
+  
+  .card-unified {
+    @apply card-base card-light card-dark;
+  }
+  
+  /* Colored Card Base */
+  .card-colored {
+    @apply card-base rounded-lg p-4 transition-all duration-300;
+  }
+  
+  .card-blue {
+    @apply bg-blue-50 dark:bg-blue-900/40 border-blue-200 dark:border-blue-700;
+  }
+  
+  .card-purple {
+    @apply bg-purple-50 dark:bg-purple-900/40 border-purple-200 dark:border-purple-700;
+  }
+  
+  .card-green {
+    @apply bg-green-50 dark:bg-green-900/40 border-green-200 dark:border-green-700;
+  }
+  
+  .card-red {
+    @apply bg-red-50 dark:bg-red-900/40 border-red-200 dark:border-red-700;
+  }
+  
+  .card-yellow {
+    @apply bg-yellow-50 dark:bg-yellow-900/40 border-yellow-200 dark:border-yellow-700;
+  }
+  
+  .card-cyan {
+    @apply bg-cyan-50 dark:bg-cyan-900/40 border-cyan-200 dark:border-cyan-700;
+  }
+  
+  .card-indigo {
+    @apply bg-indigo-50 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-700;
+  }
+  
+  .card-pink {
+    @apply bg-pink-50 dark:bg-pink-900/40 border-pink-200 dark:border-pink-700;
+  }
+  
+  /* Text colors with high contrast */
+  .text-blue-accent {
+    @apply text-blue-700 dark:text-blue-300;
+  }
+  
+  .text-purple-accent {
+    @apply text-purple-700 dark:text-purple-300;
+  }
+  
+  .text-green-accent {
+    @apply text-green-700 dark:text-green-300;
+  }
+  
+  .text-red-accent {
+    @apply text-red-700 dark:text-red-300;
+  }
+  
+  .text-yellow-accent {
+    @apply text-yellow-700 dark:text-yellow-300;
+  }
+  
+  .text-cyan-accent {
+    @apply text-cyan-700 dark:text-cyan-300;
+  }
+  
+  .text-indigo-accent {
+    @apply text-indigo-700 dark:text-indigo-300;
+  }
+  
+  .text-pink-accent {
+    @apply text-pink-700 dark:text-pink-300;
+  }
+}
+
+/* ==================== TYPOGRAPHY WITH CONTRAST ==================== */
+
+@layer components {
+  .heading-primary {
+    @apply text-2xl font-bold text-slate-900 dark:text-white;
+  }
+  
+  .heading-secondary {
+    @apply text-lg font-bold text-slate-800 dark:text-slate-100;
+  }
+  
+  .heading-tertiary {
+    @apply text-sm font-semibold text-slate-700 dark:text-slate-200;
+  }
+  
+  .text-primary {
+    @apply text-slate-900 dark:text-white;
+  }
+  
+  .text-secondary {
+    @apply text-slate-600 dark:text-slate-300;
+  }
+  
+  .text-tertiary {
+    @apply text-slate-500 dark:text-slate-400;
+  }
+  
+  .text-muted {
+    @apply text-slate-400 dark:text-slate-500;
+  }
+}
+
+/* ==================== INTERACTIVE ELEMENTS ==================== */
+
+@layer components {
+  .interactive-item {
+    @apply p-2 rounded transition-all duration-200 cursor-pointer;
+  }
+  
+  .interactive-light {
+    @apply hover:bg-slate-100 dark:hover:bg-slate-700;
+  }
+  
+  .interactive-highlight {
+    @apply hover:bg-blue-100 dark:hover:bg-blue-900/30;
+  }
+}
+
+/* ==================== CHART & VISUALIZATION STYLING ==================== */
+
+@layer components {
+  .glass-card {
+    @apply relative overflow-hidden rounded-xl border border-border/50;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    backdrop-filter: blur(10px);
+  }
+  
+  .chart-container {
+    @apply p-4 rounded-xl border border-border/40;
+    background: linear-gradient(145deg, hsl(222 47% 13%) 0%, hsl(222 47% 9%) 100%);
+  }
+  
+  .chart-card {
+    @apply bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-600;
+  }
+  
+  /* Recharts customization */
+  .recharts-default-tooltip {
+    @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-lg;
+  }
+  
+  .recharts-tooltip-label {
+    @apply text-slate-900 dark:text-white font-semibold;
+  }
+  
+  .recharts-tooltip-item {
+    @apply text-slate-700 dark:text-slate-300;
+  }
+}
+
+/* ==================== PROGRESS & INDICATORS ==================== */
+
+@layer components {
+  .progress-bar {
+    @apply w-full bg-slate-300 dark:bg-slate-600 rounded-full h-2 overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-2 rounded-full transition-all duration-500;
+  }
+  
+  .badge-base {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+  
+  .badge-primary {
+    @apply badge-base bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300;
+  }
+  
+  .badge-success {
+    @apply badge-base bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300;
+  }
+  
+  .badge-danger {
+    @apply badge-base bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300;
+  }
+  
+  .badge-warning {
+    @apply badge-base bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300;
+  }
+}
+
+/* ==================== HOVER & TRANSITION EFFECTS ==================== */
+
+@layer components {
+  .hover-lift {
+    @apply transition-all duration-300 hover:shadow-lg hover:scale-102;
+  }
+  
+  .smooth-transition {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .border-accent-hover {
+    @apply hover:border-blue-400 dark:hover:border-blue-500 transition-colors duration-200;
+  }
+}
+
+/* ==================== SPACING & LAYOUT ==================== */
+
+@layer components {
+  .section-spacing {
+    @apply p-6 mb-6;
+  }
+  
+  .card-spacing {
+    @apply p-4 mb-4;
+  }
+  
+  .grid-auto {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+  }
+  
+  .grid-2col {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+  
+  .grid-full {
+    @apply grid grid-cols-1 gap-4;
+  }
+}
+
+/* ==================== SCROLLBAR STYLING ==================== */
+
+@layer utilities {
+  /* Custom scrollbar for light mode */
+  .scrollbar-light::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-light::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+  }
+  
+  .scrollbar-light::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-lg hover:bg-slate-400;
+  }
+  
+  /* Custom scrollbar for dark mode */
+  .scrollbar-dark::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-dark::-webkit-scrollbar-track {
+    @apply dark:bg-slate-700;
+  }
+  
+  .scrollbar-dark::-webkit-scrollbar-thumb {
+    @apply dark:bg-slate-500 dark:rounded-lg dark:hover:bg-slate-400;
+  }
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+
+@layer components {
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-slate-800;
+  }
+  
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden clip whitespace-nowrap border-0;
+  }
+}
+
+/* ==================== ANIMATION ==================== */
+
+@layer utilities {
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-slideIn {
+    animation: slideIn 0.3s ease-out;
+  }
+}
+
+/* ==================== PRINT STYLES ==================== */
+
+@media print {
+  .no-print {
+    @apply hidden;
+  }
+  
+  .print-only {
+    @apply block;
+  }
+}
