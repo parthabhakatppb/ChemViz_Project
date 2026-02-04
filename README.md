@@ -29,6 +29,22 @@ cd desktop
 ..\backend\venv\Scripts\python.exe desktop_app.py
 ```
 
+## Basic Auth
+The API uses HTTP Basic Auth. Create a Django user, then provide credentials to clients.
+
+Create user:
+```
+cd backend
+.\venv\Scripts\python.exe manage.py createsuperuser
+```
+
+Web app auth (optional):
+- Set `VITE_BASIC_AUTH_USER` and `VITE_BASIC_AUTH_PASS` in `frontend/.env`
+- Or set in browser console: `localStorage.setItem("basicAuth", btoa("user:pass"))`
+
+Desktop app auth:
+- Set environment variables `CHEMVIZ_BASIC_AUTH_USER` and `CHEMVIZ_BASIC_AUTH_PASS`
+
 ## Key Features
 - Statistical analysis (mean, median, std dev, percentiles, IQR)
 - Data quality metrics (missing values, duplicates, completeness)
@@ -48,6 +64,9 @@ cd desktop
 
 ## API Summary
 Base URL: http://localhost:8000/api/
+
+PDF report:
+- GET /report/{id}/
 
 Core endpoints:
 - POST /upload/

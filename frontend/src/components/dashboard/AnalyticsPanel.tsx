@@ -44,65 +44,6 @@ const CARD_COLORS = {
 export const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ data }) => {
   if (!data) return null;
 
-  const renderDataVolumeChart = () => {
-    const volumeData = [
-      { name: 'Rows', value: data.row_count },
-      { name: 'Columns', value: data.column_count },
-    ];
-
-    return (
-      <div className={`${THEME.light.bg} ${THEME.dark.bg} rounded-xl p-6 mb-6 border ${THEME.light.border} ${THEME.dark.border} ${THEME.light.shadow} transition-all duration-300`}>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className={`text-2xl font-bold ${THEME.light.text} ${THEME.dark.text}`}>📊 Dataset Overview</h3>
-            <p className={`text-sm ${THEME.light.textMuted} ${THEME.dark.textMuted} mt-1`}>Complete dataset statistics and composition</p>
-          </div>
-          <BarChart3 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className={`${THEME.light.bgAlt} ${THEME.dark.bgAlt} rounded-lg p-4 border ${THEME.light.border} ${THEME.dark.border}`}>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={volumeData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  label={({name, value}) => `${name}: ${value}`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {volumeData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={['#2563eb', '#0ea5e9'][index]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="space-y-3">
-            <div className={`${CARD_COLORS.blue.bg} border-l-4 border-l-blue-600 ${CARD_COLORS.blue.border} rounded-lg p-4 hover:shadow-md transition-all duration-300`}>
-              <div className={`text-sm font-semibold ${CARD_COLORS.blue.accent}`}>Total Records</div>
-              <div className={`text-4xl font-bold text-blue-700 dark:text-blue-300 mt-1`}>{data.row_count.toLocaleString()}</div>
-              <div className={`text-xs ${CARD_COLORS.blue.accent} mt-2`}>rows of data</div>
-            </div>
-            <div className={`${CARD_COLORS.purple.bg} border-l-4 border-l-purple-600 ${CARD_COLORS.purple.border} rounded-lg p-4 hover:shadow-md transition-all duration-300`}>
-              <div className={`text-sm font-semibold ${CARD_COLORS.purple.accent}`}>Total Features</div>
-              <div className={`text-4xl font-bold text-purple-700 dark:text-purple-300 mt-1`}>{data.column_count}</div>
-              <div className={`text-xs ${CARD_COLORS.purple.accent} mt-2`}>columns/attributes</div>
-            </div>
-            <div className={`${CARD_COLORS.green.bg} border-l-4 border-l-green-600 ${CARD_COLORS.green.border} rounded-lg p-4 hover:shadow-md transition-all duration-300`}>
-              <div className={`text-sm font-semibold ${CARD_COLORS.green.accent}`}>Total Cells</div>
-              <div className={`text-4xl font-bold text-green-700 dark:text-green-300 mt-1`}>{(data.row_count * data.column_count).toLocaleString()}</div>
-              <div className={`text-xs ${CARD_COLORS.green.accent} mt-2`}>data points</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const renderDataQualityOverview = () => {
     if (!data.data_quality) return null;
     const dq = data.data_quality;
@@ -574,6 +515,66 @@ export const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ data }) => {
             <Line type="monotone" dataKey="stdDev" stroke="#ef4444" strokeWidth={2} name="Std Dev" />
           </ComposedChart>
         </ResponsiveContainer>
+      </div>
+    );
+  };
+
+  const renderInsightPie = () => {
+    if (!data.data_quality) return null;
+    const dq = data.data_quality;
+    const completeness = dq.total_cells ? ((dq.total_cells - dq.missing_cells) / dq.total_cells) * 100 : 0;
+    const integrity = data.row_count ? (1 - (dq.duplicate_rows / data.row_count)) * 100 : 0;
+
+    const pieData = [
+      { name: 'Completeness', value: Number(completeness.toFixed(1)) },
+      { name: 'Integrity', value: Number(integrity.toFixed(1)) },
+    ];
+
+    return (
+      <div className="bg-white dark:bg-slate-800 rounded-xl p-6 mb-6 border border-slate-300 dark:border-slate-600 shadow-md">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">✨ Data Quality Snapshot</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">Completeness and integrity at a glance</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={90}
+                paddingAngle={4}
+                dataKey="value"
+                label={({ name, value }) => `${name} ${value}%`}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={[ "#2563eb", "#0ea5e9" ][index]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="space-y-3">
+            <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 border border-slate-200 dark:border-slate-600">
+              <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Completeness</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">{completeness.toFixed(1)}%</div>
+              <div className="text-xs text-slate-500 mt-1">
+                {dq.total_cells - dq.missing_cells} / {dq.total_cells} cells filled
+              </div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 border border-slate-200 dark:border-slate-600">
+              <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Integrity</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">{integrity.toFixed(1)}%</div>
+              <div className="text-xs text-slate-500 mt-1">
+                {dq.duplicate_rows} duplicate rows
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -1076,16 +1077,16 @@ export const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ data }) => {
 
   return (
     <div className="space-y-6">
-      {renderDataVolumeChart()}
+      {renderInsightPie()}
+      {renderComparisonMatrix()}
+      {renderTrendAnalysis()}
+      {renderVariabilityAnalysis()}
+      {renderDistributionComparison()}
       {renderAdvancedMetrics()}
       {renderDataQualityMetrics()}
       {renderDataCompleteness()}
       {renderComplexityScore()}
       {renderRangeAnalysis()}
-      {renderComparisonMatrix()}
-      {renderTrendAnalysis()}
-      {renderVariabilityAnalysis()}
-      {renderDistributionComparison()}
       {renderPercentileDistribution()}
       {renderDataQualityOverview()}
       {renderStatisticalAnalysis()}

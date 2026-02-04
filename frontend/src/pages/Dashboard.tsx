@@ -15,19 +15,161 @@ import { DataValidation } from "@/components/dashboard/DataValidation";
 import { RawDataViewer } from "@/components/dashboard/RawDataViewer";
 import { ExportButtons } from "@/components/ui/ExportButtons";
 import { useTheme } from "@/hooks/useTheme";
+import { apiFetch, API_URL } from "@/utils/api";
+import { getStoredBasicAuth, setStoredBasicAuth, clearStoredBasicAuth } from "@/utils/api";
 
 const Dashboard = () => {
-    const { datasets, fetchDatasets, uploadDataset, uploading } = useDatasets();
+    const [authReady, setAuthReady] = useState(false);
+    const [authToken, setAuthToken] = useState<string | null>(null);
+    const [authUser, setAuthUser] = useState<string>(import.meta.env.VITE_BASIC_AUTH_USER || "");
+    const [authPass, setAuthPass] = useState<string>(import.meta.env.VITE_BASIC_AUTH_PASS || "");
+    const [authError, setAuthError] = useState<string | null>(null);
+    const [isSignup, setIsSignup] = useState(false);
+    const [authEmail, setAuthEmail] = useState("");
+    const { datasets, fetchDatasets, uploadDataset, uploading } = useDatasets(!!authToken);
     const [selectedData, setSelectedData] = useState<any>(null);
     const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'validation' | 'comparison' | 'favorites' | 'raw-data'>('overview');
     const { theme, toggleTheme } = useTheme();
     const [isFavorite, setIsFavorite] = useState(false);
     const [isLoadingDataset, setIsLoadingDataset] = useState(false);
 
-    useEffect(() => { 
-        // Refetch datasets when component mounts or when datasets list changes
-        fetchDatasets();
+    useEffect(() => {
+        clearStoredBasicAuth();
+        setAuthToken(null);
+        setAuthReady(true);
     }, []);
+
+    useEffect(() => {
+        const onLogout = () => setAuthToken(null);
+        window.addEventListener("auth:logout", onLogout);
+        return () => window.removeEventListener("auth:logout", onLogout);
+    }, []);
+
+    useEffect(() => { 
+        if (authToken) {
+            fetchDatasets();
+        }
+    }, [authToken, fetchDatasets]);
+
+    const handleLogin = async () => {
+        if (!authUser || !authPass) {
+            setAuthError("Enter username and password");
+            return;
+        }
+        const token = setStoredBasicAuth(authUser, authPass);
+        setAuthToken(token);
+        setAuthError(null);
+
+        // Validate credentials
+        const res = await apiFetch(`/history/`);
+        if (res.status === 401) {
+            clearStoredBasicAuth();
+            setAuthToken(null);
+            setAuthError("Invalid credentials");
+        }
+    };
+
+    const handleSignup = async () => {
+        if (!authUser || !authPass) {
+            setAuthError("Enter username and password");
+            return;
+        }
+        try {
+            const res = await fetch(`${API_URL}/signup/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: authUser, password: authPass, email: authEmail }),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                setAuthError(err.error || "Signup failed");
+                return;
+            }
+            setAuthError(null);
+            const token = setStoredBasicAuth(authUser, authPass);
+            setAuthToken(token);
+        } catch (e) {
+            setAuthError("Signup failed");
+        }
+    };
+
+    const handleLogout = () => {
+        clearStoredBasicAuth();
+        setAuthToken(null);
+    };
+
+    if (!authReady) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                <div className="text-slate-500">Loading...</div>
+            </div>
+        );
+    }
+
+    if (!authToken) {
+        return (
+            <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'dark bg-slate-950' : 'bg-slate-50'}`}>
+                <div className={`w-full max-w-md p-8 rounded-2xl border shadow-lg ${theme === 'dark' ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+                    <h1 className="text-2xl font-bold mb-2">ChemViz {isSignup ? "Sign Up" : "Login"}</h1>
+                    <p className="text-sm text-slate-500 mb-6">Enter your API credentials to continue.</p>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">Username</label>
+                            <input
+                                value={authUser}
+                                onChange={(e) => setAuthUser(e.target.value)}
+                                className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent"
+                                placeholder="Username"
+                            />
+                        </div>
+                        {isSignup && (
+                            <div>
+                                <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">Email (optional)</label>
+                                <input
+                                    value={authEmail}
+                                    onChange={(e) => setAuthEmail(e.target.value)}
+                                    className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent"
+                                    placeholder="Email"
+                                />
+                            </div>
+                        )}
+                        <div>
+                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">Password</label>
+                            <input
+                                type="password"
+                                value={authPass}
+                                onChange={(e) => setAuthPass(e.target.value)}
+                                className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent"
+                                placeholder="Password"
+                            />
+                        </div>
+                        {authError && <div className="text-sm text-red-500">{authError}</div>}
+                        {!isSignup ? (
+                            <button
+                                onClick={handleLogin}
+                                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                            >
+                                Sign In
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleSignup}
+                                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                            >
+                                Create Account
+                            </button>
+                        )}
+                        <button
+                            onClick={() => { setIsSignup(!isSignup); setAuthError(null); }}
+                            className="w-full text-sm text-slate-500 hover:text-slate-700"
+                        >
+                            {isSignup ? "Already have an account? Sign in" : "Need an account? Sign up"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
         const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
             if(e.target.files?.[0]) {
@@ -44,7 +186,7 @@ const Dashboard = () => {
             setIsLoadingDataset(true);
             try {
                 // Fetch specific dataset details
-                const res = await fetch(`http://127.0.0.1:8000/api/dashboard/${id}/`);
+                const res = await apiFetch(`/dashboard/${id}/`);
                 if (!res.ok) {
                     throw new Error(`Failed to load dataset: HTTP ${res.status}`);
                 }
@@ -69,7 +211,7 @@ const Dashboard = () => {
 
     const checkIfFavorite = async (datasetId: number) => {
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/favorites/`);
+            const res = await apiFetch(`/favorites/`);
             const favorites = await res.json();
             setIsFavorite(favorites.some((f: any) => f.dataset.id === datasetId));
         } catch (error) {
@@ -82,7 +224,7 @@ const Dashboard = () => {
     
         try {
             const method = isFavorite ? 'DELETE' : 'POST';
-            await fetch(`http://127.0.0.1:8000/api/favorite/${selectedData.id}/`, { method });
+            await apiFetch(`/favorite/${selectedData.id}/`, { method });
             setIsFavorite(!isFavorite);
         } catch (error) {
             console.error('Failed to toggle favorite:', error);
@@ -166,6 +308,9 @@ const Dashboard = () => {
                                     <ExportButtons datasetId={selectedData.id} filename={selectedData.original_file_name} />
                                 </>
                             )}
+                            <button onClick={handleLogout} className="p-2 rounded-lg text-slate-500 hover:text-slate-700">
+                                <LogOut className="w-5 h-5" />
+                            </button>
                             <div className="relative">
                                     <input type="file" onChange={handleUpload} className="absolute inset-0 opacity-0 cursor-pointer" accept=".csv"/>
                                     <Button disabled={uploading} className="flex gap-2">

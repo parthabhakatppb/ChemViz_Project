@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
+import { apiFetch } from '@/utils/api';
 
 interface FavoriteDataset {
   id: number;
@@ -21,7 +22,7 @@ export const FavoritesPanel: React.FC = () => {
 
   const fetchFavorites = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/favorites/');
+      const response = await apiFetch('/favorites/');
       const data = await response.json();
       setFavorites(data);
     } catch (error) {
@@ -33,7 +34,7 @@ export const FavoritesPanel: React.FC = () => {
 
   const removeFavorite = async (datasetId: number) => {
     try {
-      await fetch(`http://localhost:8000/api/favorite/${datasetId}/`, {
+      await apiFetch(`/favorite/${datasetId}/`, {
         method: 'DELETE',
       });
       setFavorites(favorites.filter(f => f.dataset.id !== datasetId));

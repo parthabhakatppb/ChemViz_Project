@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, AlertCircle, Plus, Shield, TrendingUp, Filter } from 'lucide-react';
+import { apiFetch } from '@/utils/api';
 
 interface ValidationIssue {
   column: string;
@@ -41,7 +42,7 @@ export const DataValidation: React.FC<DataValidationProps> = ({ datasetId, colum
   const handleValidate = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/${datasetId}/`);
+      const response = await apiFetch(`/validate/${datasetId}/`);
       const data = await response.json();
       setValidationResults(data);
     } catch (error) {
@@ -58,7 +59,7 @@ export const DataValidation: React.FC<DataValidationProps> = ({ datasetId, colum
     }
 
     try {
-      await fetch(`http://localhost:8000/api/validation-rules/${datasetId}/`, {
+      await apiFetch(`/validation-rules/${datasetId}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

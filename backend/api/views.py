@@ -1,13 +1,37 @@
 import pandas as pd
 import logging
+from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import AllowAny
 from .models import Dataset
 from .serializers import DatasetSerializer
 from .ml_models import MLAnalytics
 
 logger = logging.getLogger(__name__)
+User = get_user_model()
+
+class SignupView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            username = (request.data.get("username") or "").strip()
+            password = request.data.get("password") or ""
+            email = (request.data.get("email") or "").strip()
+
+            if not username or not password:
+                return Response({"error": "Username and password are required"}, status=400)
+            if User.objects.filter(username=username).exists():
+                return Response({"error": "Username already exists"}, status=400)
+
+            user = User.objects.create_user(username=username, password=password, email=email or None)
+            return Response({"id": user.id, "username": user.username}, status=201)
+        except Exception as e:
+            logger.error(f"Signup error: {str(e)}")
+            return Response({"error": "Signup failed"}, status=500)
 
 class FileUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -218,4 +242,3 @@ class HistoryView(APIView):
         datasets = Dataset.objects.order_by('-uploaded_at')[:5]
         serializer = DatasetSerializer(datasets, many=True)
         return Response(serializer.data)
-

@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import FileUploadView, DashboardDataView, RawDataView, HistoryView
-from .export_views import ExportDataView, SearchDatasetsView
+from .views import FileUploadView, DashboardDataView, RawDataView, HistoryView, SignupView
+from .export_views import ExportDataView, SearchDatasetsView, ReportPDFView
 from .extended_views import (
     FavoriteDatasetView, GetFavoritesView, DatasetVersionView,
     ValidationRuleView, ValidateDatasetView, ComparisonView,
@@ -9,11 +9,13 @@ from .extended_views import (
 
 urlpatterns = [
     # Core endpoints
+    path('signup/', SignupView.as_view(), name='signup'),
     path('upload/', FileUploadView.as_view(), name='file-upload'),
     path('dashboard/<int:pk>/', DashboardDataView.as_view(), name='dashboard-data'),
     path('raw-data/<int:pk>/', RawDataView.as_view(), name='raw-data'),
     path('history/', HistoryView.as_view(), name='history'),
     path('export/<int:pk>/<str:format>/', ExportDataView.as_view(), name='export-data'),
+    path('report/<int:pk>/', ReportPDFView.as_view(), name='report-pdf'),
     path('search/', SearchDatasetsView.as_view(), name='search-datasets'),
     
     # Favorites

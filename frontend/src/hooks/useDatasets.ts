@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { apiFetch } from "@/utils/api";
 
-const API_URL = "http://127.0.0.1:8000/api";
-
-export const useDatasets = () => {
+export const useDatasets = (enabled: boolean = true) => {
   const [datasets, setDatasets] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -13,7 +12,7 @@ export const useDatasets = () => {
   const fetchDatasets = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/history/`);
+      const res = await apiFetch(`/history/`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       // Map Django keys to React expected keys
@@ -35,18 +34,19 @@ export const useDatasets = () => {
 
   // Auto-fetch datasets on component mount
   useEffect(() => {
-    if (!isInitialized) {
+    if (enabled && !isInitialized) {
       fetchDatasets();
     }
-  }, [isInitialized, fetchDatasets]);
+  }, [enabled, isInitialized, fetchDatasets]);
 
   const uploadDataset = useCallback(async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
+    if (!enabled) return;
     setUploading(true);
 
     try {
-      const res = await fetch(`${API_URL}/upload/`, { method: "POST", body: formData });
+      const res = await apiFetch(`/upload/`, { method: "POST", body: formData });
       
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
@@ -57,7 +57,7 @@ export const useDatasets = () => {
       const result = await res.json();
       
       // Fetch stats immediately
-      const statsRes = await fetch(`${API_URL}/dashboard/${result.id}/`);
+      const statsRes = await apiFetch(`/dashboard/${result.id}/`);
       const statsData = await statsRes.json();
 
       const avgTemp = statsData?.avg_temperature;

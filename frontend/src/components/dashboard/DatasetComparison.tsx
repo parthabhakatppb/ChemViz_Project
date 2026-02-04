@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GitCompare, BarChart3, Database, Zap, CheckCircle2, AlertCircle } from 'lucide-react';
+import { apiFetch } from '@/utils/api';
 
 interface ComparisonResult {
   id: number;
@@ -42,7 +43,7 @@ export const DatasetComparison: React.FC<DatasetComparisonProps> = ({ datasets }
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/compare/', {
+      const response = await apiFetch('/compare/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dataset1_id: dataset1, dataset2_id: dataset2 }),

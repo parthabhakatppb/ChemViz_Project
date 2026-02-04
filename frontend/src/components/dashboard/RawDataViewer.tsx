@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, Download, Search, Copy, Eye, EyeOff } from "lucide-react";
+import { apiFetch } from "@/utils/api";
 
 interface RawDataViewerProps {
   datasetId: number;
@@ -25,7 +26,7 @@ export const RawDataViewer: React.FC<RawDataViewerProps> = ({ datasetId, filenam
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/raw-data/${datasetId}/`);
+      const res = await apiFetch(`/raw-data/${datasetId}/`);
       if (!res.ok) throw new Error(`Failed to fetch data: HTTP ${res.status}`);
       
       const data = await res.json();

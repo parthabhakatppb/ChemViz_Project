@@ -66,3 +66,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS CONFIG FOR REACT
 CORS_ALLOW_ALL_ORIGINS = True
+
+# DRF Auth (HTTP Basic)
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
